@@ -1,7 +1,7 @@
 import XCTest
-@testable import FluentVapor
+@testable import VaporFluent
 
-class FluentVaporTests: XCTestCase {
+class VaporFluentTests: XCTestCase {
     func testExample() {
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct results.
@@ -9,9 +9,7 @@ class FluentVaporTests: XCTestCase {
     }
 
 
-    static var allTests : [(String, (FluentVaporTests) -> () throws -> Void)] {
-        return [
-            ("testExample", testExample),
-        ]
-    }
+    static var allTests = [
+        ("testExample", testExample),
+    ]
 }
