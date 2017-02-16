@@ -1,6 +1,6 @@
 import XCTest
-@testable import FluentVaporTests
+@testable import VaporFluentTests
 
 XCTMain([
-     testCase(FluentVaporTests.allTests),
+     testCase(VaporFluentTests.allTests),
 ])
