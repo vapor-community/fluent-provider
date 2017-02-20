@@ -1,9 +1,8 @@
-
 import Fluent
 import Vapor
 
-private let fluentPreparationsKey = "fluentvapor-preparations"
-private let fluentDatabaseKey = "fluentvapor-database"
+private let fluentPreparationsKey = "fluent-vapor-preparations"
+private let fluentDatabaseKey = "fluent-vapor-database"
 
 extension Droplet {
     /// The preparations that should be run by the droplet

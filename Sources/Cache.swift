@@ -15,10 +15,10 @@ public final class FluentCache: CacheProtocol {
     }
 
     public func set(_ key: String, _ value: Node) throws {
-        if var entity = try _find(key) {
+        if let entity = try _find(key) {
             try entity.save()
         } else {
-            var entity = CacheEntity(key: key, value: value)
+            let entity = CacheEntity(key: key, value: value)
             try entity.save()
         }
     }
@@ -40,11 +40,9 @@ extension FluentCache {
     public final class CacheEntity: Fluent.Entity {
         public static var entity = "cache"
 
-        public var id: Node?
         public var key: String
         public var value: Node
-
-        public var exists = false
+        public let storage = Storage()
 
         init(key: String, value: Node) {
             self.key = key
@@ -52,14 +50,13 @@ extension FluentCache {
         }
 
         public init(node: Node, in context: Context) throws {
-            id = try node.extract("id")
             key = try node.extract("key")
             value = try node.extract("value")
         }
 
         public func makeNode(context: Context) throws -> Node {
             return try Node(node: [
-                "id": id,
+                idKey: id,
                 "key": key,
                 "value": value
             ])

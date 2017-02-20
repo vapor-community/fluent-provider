@@ -1,4 +1,4 @@
-public final class FluentVaporProvider: Provider {
+public final class Provider: Vapor.Provider {
     public init() {}
     public init(config: Settings.Config) {}
 

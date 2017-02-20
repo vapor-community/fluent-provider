@@ -1,9 +1,7 @@
 import Console
 import Fluent
 
-/**
- Runs the droplet's `Preparation`s.
- */
+/// Runs the droplet's `Preparation`s.
 public struct Prepare: Command {
     public let id: String = "prepare"
 
