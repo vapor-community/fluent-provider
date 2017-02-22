@@ -4,7 +4,8 @@ import Fluent
 extension Droplet {
     /// Adds Driver to the Droplet the `fluent.json` specifies it.
     public func addConfigurable(driver: Driver, name: String) {
-        if config["fluent", "driver"]?.string == name {
+        let configuredDriver = config["fluent", "driver"]?.string ?? name
+        if configuredDriver == name {
             set(driver)
             self.log.debug("Using database driver '\(name)'.")
         } else {
@@ -15,13 +16,15 @@ extension Droplet {
     /// Adds a ConfigInitializable Driver type to the Droplet if
     /// the `fluent.json` specifies it.
     public func addConfigurable<D: Driver & ConfigInitializable>(driver: D.Type, name: String) {
+        let configuredDriver = config["fluent", "driver"]?.string ?? name
+
         do {
-            if config["fluent", "driver"]?.string == name {
+            if configuredDriver == name {
                 let driver = try driver.init(config: config)
                 set(driver)
                 self.log.debug("Using database driver '\(name)'.")
             } else {
-                self.log.debug("Not using database driver '\(name)'.")
+                self.log.debug("Not using database driver '\(name)'. Configured for '\(name)'")
             }
         } catch {
             self.log.warning("Could not configure database driver '\(name)': \(error)")
