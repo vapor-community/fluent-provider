@@ -31,6 +31,10 @@ extension Droplet {
     /// Sets the driver to this Droplet by
     /// creating a Database.
     private func set(_ driver: Driver) {
+        if let existing = self.database?.driver {
+            log.warning("overwriting existing driver \(existing) with \(driver)")
+        }
+
         if let maxConnections = config["fluent", "maxConnections"]?.int {
             self.database = Database(driver, maxConnections: maxConnections)
         } else {
