@@ -20,13 +20,10 @@ extension Model {
 }
 
 // MARK: StringInitializable
-extension Entity {
+extension StringInitializable where Self: Entity {
     public init?(from string: String) throws {
-        // FIXME: hacky
-        let node = try Self.query().filter(Self.idKey, .equals, string).raw()
-        if case .array(let array) = node, let first = array.first {
-            try self.init(node: first)
-            id = first[Self.idKey]
+        if let model = try Self.find(string) {
+            self = model
         } else {
             return nil
         }
