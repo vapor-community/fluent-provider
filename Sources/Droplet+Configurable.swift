@@ -14,18 +14,14 @@ extension Droplet {
 
     /// Adds a ConfigInitializable Driver type to the Droplet if
     /// the `fluent.json` specifies it.
-    public func addConfigurable<D: Driver & ConfigInitializable>(driver: D.Type, name: String) {
-        do {
-            if config["fluent", "driver"]?.string == name {
-                let driver = try driver.init(config: config)
-                set(driver)
-                self.log.debug("Using database driver '\(name)'.")
-            } else {
-                self.log.debug("Not using database driver '\(name)'.")
-            }
-        } catch {
-            self.log.warning("Could not configure database driver '\(name)': \(error)")
-        }
+    public func addConfigurable<D: Driver & ConfigInitializable>(driver: D.Type, name: String) throws {
+		if config["fluent", "driver"]?.string == name {
+			let driver = try driver.init(config: config)
+			set(driver)
+			self.log.debug("Using database driver '\(name)'.")
+		} else {
+			self.log.debug("Not using database driver '\(name)'.")
+		}
     }
 
     /// Sets the driver to this Droplet by
