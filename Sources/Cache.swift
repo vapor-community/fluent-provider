@@ -2,7 +2,7 @@ import Cache
 
 public final class FluentCache: CacheProtocol {
     public let database: Database
-    public init(database: Database) {
+    public init(_ database: Database) {
         self.database = database
     }
 
@@ -50,8 +50,8 @@ extension FluentCache {
         }
 
         public init(node: Node, in context: Context) throws {
-            key = try node.extract("key")
-            value = try node.extract("value")
+            key = try node.get("key")
+            value = try node.get("value")
         }
 
         public func makeNode(context: Context) throws -> Node {
@@ -63,15 +63,15 @@ extension FluentCache {
         }
 
         public static func prepare(_ database: Database) throws {
-            try database.create(CacheEntity.entity) { entity in
+            try database.create(CacheEntity.self) { entity in
                 entity.id(for: self)
                 entity.string("key")
                 entity.string("value")
             }
         }
 
-        public  static func revert(_ database: Database) throws {
-            try database.delete(CacheEntity.entity)
+        public static func revert(_ database: Database) throws {
+            try database.delete(CacheEntity.self)
         }
     }
 }

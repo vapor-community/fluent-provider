@@ -50,7 +50,14 @@ public struct Prepare: Command {
 
             let hasPrepared = try database.hasPrepared(preparation)
             // only prepare the unprepared
-            guard !hasPrepared else { return }
+            guard !hasPrepared else { 
+                if let model = preparation as? Entity.Type {
+                    // db prepared, allow model to access 
+                    model.database = database
+                }
+                return 
+            }
+
             console.info("Preparing \(name)")
             try database.prepare(preparation)
             console.success("Prepared \(name)")
