@@ -11,7 +11,6 @@ public final class Provider: Vapor.Provider {
         if let db = drop.database {
             drop.addConfigurable(cache: FluentCache(db), name: "fluent")    
         }
-        
 
         let prepare = Prepare(
             console: drop.console, 
