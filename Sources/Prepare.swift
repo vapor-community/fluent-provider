@@ -50,7 +50,16 @@ public struct Prepare: Command {
 
             let hasPrepared = try database.hasPrepared(preparation)
             // only prepare the unprepared
-            guard !hasPrepared else { return }
+            guard !hasPrepared else { 
+                if let model = preparation as? Entity.Type {
+                    // the model has already prepared, so we must exit early
+                    // to prevent a duplicate preparation.
+                    // the model.database property must be set manually
+                    model.database = database
+                }
+                return 
+            }
+
             console.info("Preparing \(name)")
             try database.prepare(preparation)
             console.success("Prepared \(name)")
