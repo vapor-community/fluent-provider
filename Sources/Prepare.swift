@@ -52,7 +52,9 @@ public struct Prepare: Command {
             // only prepare the unprepared
             guard !hasPrepared else { 
                 if let model = preparation as? Entity.Type {
-                    // db prepared, allow model to access 
+                    // the model has already prepared, so we must exit early
+                    // to prevent a duplicate preparation.
+                    // the model.database property must be set manually
                     model.database = database
                 }
                 return 
