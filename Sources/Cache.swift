@@ -55,7 +55,7 @@ extension FluentCache {
             value = try node.get("value")
         }
 
-        public func makeNode(context: Context) throws -> Node {
+        public func makeNode(in context: Context) throws -> Node {
             return try Node(node: [
                 idKey: id,
                 "key": key,
