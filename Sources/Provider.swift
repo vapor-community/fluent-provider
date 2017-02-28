@@ -108,6 +108,9 @@ public final class Provider: Vapor.Provider {
             if let keyNamingConvention = self.keyNamingConvention {
                 db.keyNamingConvention = keyNamingConvention
             }
+        } else {
+            let driver = drop.config["fluent", "driver"]?.string ?? ""
+            drop.log.warning("No database has been set. Make sure you have properly configured the provider for driver type '\(driver)'.")
         }
 
         let prepare = Prepare(
