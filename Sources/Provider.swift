@@ -110,7 +110,22 @@ public final class Provider: Vapor.Provider {
             }
         } else {
             let driver = drop.config["fluent", "driver"]?.string ?? ""
-            drop.log.warning("No database has been set. Make sure you have properly configured the provider for driver type '\(driver)'.")
+            let reason = "Make sure you have properly configured the provider for driver type '\(driver)'"
+            if drop.preparations.count > 0 {
+                drop.log.error("Unable to run preparations without a database. \(reason).")
+                throw ConfigError.unsupported(
+                    value: driver, 
+                    key: ["driver"], 
+                    file: "fluent"
+                )
+            } else {
+                drop.log.warning("No database has been set. \(reason).")
+            }
+        }
+
+        if drop.preparations.count == 0 {
+            drop.log.warning("No preparations detected.")
+            drop.log.info("If you want to use models with Fluent, make sure to add the model to the Droplet's preparations array, e.g., `drop.preparations += ModelType.self`.")
         }
 
         let prepare = Prepare(
