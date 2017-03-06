@@ -11,14 +11,6 @@ extension Model {
     }
 }
 
-// MARK: JSONRepresentable
-extension Model {
-    public func makeJSON() throws -> JSON {
-        let node = try makeNode()
-        return try JSON(node: node)
-    }
-}
-
 // MARK: StringInitializable
 extension StringInitializable where Self: Entity {
     public init?(from string: String) throws {
