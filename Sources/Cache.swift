@@ -50,14 +50,14 @@ extension FluentCache {
             self.value = value
         }
 
-        public init(node: Node, in context: Context) throws {
+        public init(node: Node) throws {
             key = try node.get("key")
             value = try node.get("value")
         }
 
-        public func makeNode(in context: Context) throws -> Node {
+        public func makeNode(in context: Context?) throws -> Node {
             return try Node(node: [
-                idKey: id,
+                idKey: id ?? nil,
                 "key": key,
                 "value": value
             ])
