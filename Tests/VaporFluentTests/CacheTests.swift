@@ -21,7 +21,7 @@ class CacheTests: XCTestCase {
 
         // run the droplet
         background {
-            drop.run()
+            try! drop.run()
         }
         drop.console.wait(seconds: 1)
 
