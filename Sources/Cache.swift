@@ -50,17 +50,16 @@ extension FluentCache {
             self.value = value
         }
 
-        public init(node: Node) throws {
-            key = try node.get("key")
-            value = try node.get("value")
+        public init(row: Row) throws {
+            key = try row.get("key")
+            value = try row.get("value")
         }
 
-        public func makeNode(in context: Context?) throws -> Node {
-            return try Node(node: [
-                idKey: id ?? nil,
-                "key": key,
-                "value": value
-            ])
+        public func makeRow() throws -> Row {
+            var row = Row()
+            try row.set("key", key)
+            try row.set("value", value)
+            return row
         }
 
         public static func prepare(_ database: Database) throws {
