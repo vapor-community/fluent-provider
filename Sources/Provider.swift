@@ -119,6 +119,10 @@ public final class Provider: Vapor.Provider {
             Fluent.pivotNameConnector = p
         }
 
+        if let s = self.defaultPageSize {
+            Fluent.defaultPageSize = s
+        }
+
         if let k = self.defaultPageKey {
             VaporFluent.defaultPageKey = k
         }
