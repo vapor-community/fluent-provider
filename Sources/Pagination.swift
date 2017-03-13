@@ -38,3 +38,29 @@ extension Entity where Self: Paginatable {
         )
     }
 }
+
+
+extension Page: JSONRepresentable {
+    public func makeJSON() throws -> JSON {
+        var json = JSON()
+        try json.set("page.number", number)
+        try json.set("page.total", total)
+        try json.set("page.size", size)
+        let count = total / size
+        if number < count {
+            try json.set("page.next", number + 1)
+        }
+        if number > 1 {
+            try json.set("page.previous", number - 1)
+        }
+        try json.set("page.count", count)
+        try json.set("data", data)
+        return json
+    }
+}
+
+extension Page: ResponseRepresentable {
+    public func makeResponse() throws -> Response {
+        return try makeJSON().makeResponse()
+    }
+}
