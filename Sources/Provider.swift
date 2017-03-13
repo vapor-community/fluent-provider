@@ -22,14 +22,31 @@ public final class Provider: Vapor.Provider {
     /// ex: snake_case vs. camelCase.
     public let keyNamingConvention: KeyNamingConvention?
 
+    /// Default request data key for page numbers
+    public let defaultPageKey: String?
+
+    /// Default page size unless otherwise specified
+    public let defaultPageSize: Int?
+
+    /// String for connecting pivot names.
+    /// ex: user_pet vs. user+pet vs. user^pet
+    /// default is _
+    public let pivotNameConnector: String?
+
     public init(
         idKey: String? = nil,
         idType: IdentifierType? = nil,
-        keyNamingConvention: KeyNamingConvention? = nil
+        keyNamingConvention: KeyNamingConvention? = nil,
+        defaultPageKey: String? = nil,
+        defaultPageSize: Int? = nil,
+        pivotNameConnector: String? = nil
     ) {
         self.idKey = idKey
         self.idType = idType
         self.keyNamingConvention = keyNamingConvention
+        self.defaultPageKey = defaultPageKey
+        self.defaultPageSize = defaultPageSize
+        self.pivotNameConnector = pivotNameConnector
     }
 
     public init(config: Settings.Config) throws {
@@ -77,6 +94,10 @@ public final class Provider: Vapor.Provider {
             keyNamingConvention = nil
         }
 
+        self.defaultPageKey = fluent["defaultPageKey"]?.string
+        self.defaultPageSize = fluent["defaultPageSize"]?.int
+        self.pivotNameConnector = fluent["pivotNameConnector"]?.string
+
         // make sure they have specified a fluent.driver
         // to help avoid confusing `noDatabase` errors.
         guard fluent["driver"]?.string != nil else {
@@ -93,6 +114,18 @@ public final class Provider: Vapor.Provider {
         // come before the preparation calls
         try drop.addConfigurable(driver: MemoryDriver.self, name: "memory")
         try drop.addConfigurable(driver: SQLiteDriver.self, name: "sqlite")
+
+        if let p = self.pivotNameConnector {
+            Fluent.pivotNameConnector = p
+        }
+
+        if let s = self.defaultPageSize {
+            Fluent.defaultPageSize = s
+        }
+
+        if let k = self.defaultPageKey {
+            VaporFluent.defaultPageKey = k
+        }
 
         if let db = drop.database {
             drop.addConfigurable(cache: FluentCache(db), name: "fluent")    
