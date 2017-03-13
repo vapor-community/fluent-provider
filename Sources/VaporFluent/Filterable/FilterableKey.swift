@@ -19,9 +19,9 @@ public struct FilterableKey {
     /// public and query key
     public init(
         key: String,
-        comparison: Filter.Comparison = .equals,
+        _ comparison: Filter.Comparison = .equals,
         valueMap: @escaping NodeMap = { $0 }
-        ) {
+    ) {
         self.publicKey = key
         self.queryKey = key
         self.comparison = comparison
@@ -32,9 +32,9 @@ public struct FilterableKey {
     public init(
         publicKey: String,
         queryKey: String,
-        comparison: Filter.Comparison = .equals,
+        _ comparison: Filter.Comparison = .equals,
         valueMap: @escaping NodeMap = { $0 }
-        ) {
+    ) {
         self.publicKey = publicKey
         self.queryKey = queryKey
         self.comparison = comparison
