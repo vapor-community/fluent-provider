@@ -61,17 +61,19 @@ extension FluentCache {
             try row.set("value", value)
             return row
         }
+    }
+}
 
-        public static func prepare(_ database: Database) throws {
-            try database.create(CacheEntity.self) { entity in
-                entity.id(for: self)
-                entity.string("key")
-                entity.string("value")
-            }
+extension FluentCache.CacheEntity: Preparation {
+    public static func prepare(_ database: Database) throws {
+        try database.create(self) { entity in
+            entity.id(for: self)
+            entity.string("key")
+            entity.string("value")
         }
+    }
 
-        public static func revert(_ database: Database) throws {
-            try database.delete(CacheEntity.self)
-        }
+    public static func revert(_ database: Database) throws {
+        try database.delete(self)
     }
 }

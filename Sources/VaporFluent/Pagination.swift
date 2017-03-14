@@ -2,15 +2,15 @@ import HTTP
 
 public var defaultPageKey = "page"
 
-extension QueryRepresentable where T: Paginatable {
+extension QueryRepresentable where E: Paginatable {
     /// Returns a paginated response using page 
     /// number from the request data
     public func paginate(
         for req: Request,
         key: String = defaultPageKey,
-        count: Int = T.pageSize,
-        _ sorts: [Sort] = T.pageSorts
-    ) throws -> Page<T> {
+        count: Int = E.pageSize,
+        _ sorts: [Sort] = E.pageSorts
+    ) throws -> Page<E> {
         let page = req.data[key]?.int ?? 1
         return try makeQuery()
             .paginate(
