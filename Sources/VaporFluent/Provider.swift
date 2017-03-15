@@ -33,19 +33,13 @@ public final class Provider: Vapor.Provider {
     /// default is _
     public let pivotNameConnector: String?
 
-
-    /// Flag for determining whether or not
-    /// to use timestamps.
-    public let usesTimestamps: Bool?
-
     public init(
         idKey: String? = nil,
         idType: IdentifierType? = nil,
         keyNamingConvention: KeyNamingConvention? = nil,
         defaultPageKey: String? = nil,
         defaultPageSize: Int? = nil,
-        pivotNameConnector: String? = nil,
-        usesTimestamps: Bool? = nil
+        pivotNameConnector: String? = nil
     ) {
         self.idKey = idKey
         self.idType = idType
@@ -53,7 +47,6 @@ public final class Provider: Vapor.Provider {
         self.defaultPageKey = defaultPageKey
         self.defaultPageSize = defaultPageSize
         self.pivotNameConnector = pivotNameConnector
-        self.usesTimestamps = usesTimestamps
     }
 
     public init(config: Settings.Config) throws {
@@ -104,7 +97,6 @@ public final class Provider: Vapor.Provider {
         self.defaultPageKey = fluent["defaultPageKey"]?.string
         self.defaultPageSize = fluent["defaultPageSize"]?.int
         self.pivotNameConnector = fluent["pivotNameConnector"]?.string
-        self.usesTimestamps = fluent["usesTimestamps"]?.bool
 
         // make sure they have specified a fluent.driver
         // to help avoid confusing `noDatabase` errors.
@@ -135,16 +127,8 @@ public final class Provider: Vapor.Provider {
             VaporFluent.defaultPageKey = k
         }
 
-        if let t = self.usesTimestamps {
-            Fluent.usesTimestampsDefault = t
-        }
-
         if let db = drop.database {
             drop.addConfigurable(cache: FluentCache(db), name: "fluent")
-
-            if let t = self.usesTimestamps {
-                db.usesTimestamps = t
-            }
 
             if let idType = self.idType {
                 db.idType = idType
