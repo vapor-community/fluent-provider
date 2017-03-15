@@ -1,13 +1,13 @@
 import HTTP
 
-extension QueryRepresentable where T: Filterable {
+extension QueryRepresentable where E: Filterable {
     /// filters the query using data from the request
     /// in conjunction with the `filterableKeys` property
     /// on the model's type
-    public func filter(for req: Request) throws -> Query<T> {
+    public func filter(for req: Request) throws -> Query<E> {
         let query = try makeQuery()
-        for key in T.filterableKeys {
-            if let rawValue = req.data[key.publicKey] as? Node {
+        for key in E.filterableKeys {
+            if let rawValue = req.data[key.publicKey] {
                 let value = key.valueMap(rawValue)
                 try query.filter(key.queryKey, key.comparison, value)
             }

@@ -128,7 +128,7 @@ public final class Provider: Vapor.Provider {
         }
 
         if let db = drop.database {
-            drop.addConfigurable(cache: FluentCache(db), name: "fluent")    
+            drop.addConfigurable(cache: FluentCache(db), name: "fluent")
 
             if let idType = self.idType {
                 db.idType = idType
