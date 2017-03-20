@@ -10,8 +10,8 @@ extension Model {
         return try makeJSON().makeResponse()
     }
     
-    public init(node: Node, in context: Context?) throws {
-        if context?.isRow == true {
+    public init(node: Node) throws {
+        if node.context.isRow == true {
             try self.init(row: Row(node.wrapped))
         } else {
             try self.init(json: JSON(node.wrapped))
