@@ -33,6 +33,16 @@ class CacheTests: XCTestCase {
             try drop.cache.get("foo")?.string,
             "bar"
         )
+        
+        // test expiration
+        let future = Date(timeIntervalSinceNow: 1)
+        try drop.cache.set("hello", "world", expiration: future)
+        XCTAssertEqual(
+            try drop.cache.get("hello")?.string,
+            "world"
+        )
+        drop.console.wait(seconds: 2)
+        XCTAssertNil(try drop.cache.get("hello"))
 
         do {
             try drop.cache.set("foo", try Node(node: ["hello": "world"]))

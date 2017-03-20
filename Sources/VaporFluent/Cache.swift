@@ -2,24 +2,38 @@ import Cache
 
 public final class FluentCache: CacheProtocol {
     public let database: Database
-    public init(_ database: Database) {
+    public let defaultExpiration: Date?
+    public init(_ database: Database, defaultExpiration: Date? = nil) {
         self.database = database
+        self.defaultExpiration = defaultExpiration
     }
 
     public func get(_ key: String) throws -> Node? {
         guard let entity = try _find(key) else {
             return nil
         }
+        
+        if let exp = entity.expiration {
+            guard exp > Date() else {
+                try entity.delete()
+                return nil
+            }
+        }
 
         return entity.value
     }
 
-    public func set(_ key: String, _ value: Node) throws {
+    public func set(_ key: String, _ value: Node, expiration: Date?) throws {
         if let entity = try _find(key) {
             entity.value = value
+            entity.expiration = expiration
             try entity.save()
         } else {
-            let entity = CacheEntity(key: key, value: value)
+            let entity = CacheEntity(
+                key: key,
+                value: value,
+                expiration: expiration
+            )
             try entity.save()
         }
     }
@@ -43,22 +57,27 @@ extension FluentCache {
 
         public var key: String
         public var value: Node
+        public var expiration: Date?
+        
         public let storage = Storage()
 
-        init(key: String, value: Node) {
+        init(key: String, value: Node, expiration: Date?) {
             self.key = key
             self.value = value
+            self.expiration = expiration
         }
 
         public init(row: Row) throws {
             key = try row.get("key")
             value = try row.get("value")
+            expiration = try row.get("expiration")
         }
 
         public func makeRow() throws -> Row {
             var row = Row()
             try row.set("key", key)
             try row.set("value", value)
+            try row.set("expiration", expiration)
             return row
         }
     }
@@ -70,6 +89,7 @@ extension FluentCache.CacheEntity: Preparation {
             entity.id(for: self)
             entity.string("key")
             entity.string("value")
+            entity.date("expiration", optional: true)
         }
     }
 
