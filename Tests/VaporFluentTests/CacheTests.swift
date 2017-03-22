@@ -17,7 +17,7 @@ class CacheTests: XCTestCase {
         try drop.addProvider(VaporFluent.Provider.self)
         
         // add the entity for storing fluent caches
-        drop.preparations += FluentCache.CacheEntity.self
+        drop.preparations.append(FluentCache.CacheEntity.self)
 
         // run the droplet
         background {

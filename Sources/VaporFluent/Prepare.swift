@@ -86,8 +86,7 @@ public struct Prepare: Command {
         }
 
         console.print("Removing metadata")
-        let schema = Schema.delete(entity: "fluent")
-        try database.driver.schema(schema)
+        try database.removeMetadata()
         console.success("Reversion complete")
     }
 }
