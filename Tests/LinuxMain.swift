@@ -1,5 +1,5 @@
 import XCTest
-@testable import VaporFluentTests
+@testable import FluentProviderTests
 
 XCTMain([
      testCase(CacheTests.allTests),

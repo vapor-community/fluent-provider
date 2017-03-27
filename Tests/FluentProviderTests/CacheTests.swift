@@ -1,5 +1,5 @@
 import XCTest
-@testable import VaporFluent
+@testable import FluentProvider
 
 class CacheTests: XCTestCase {
     func testHappyPath() throws {
@@ -14,7 +14,7 @@ class CacheTests: XCTestCase {
             environment: .custom("debug"), 
             config: config
         )
-        try drop.addProvider(VaporFluent.Provider.self)
+        try drop.addProvider(FluentProvider.Provider.self)
         
         // add the entity for storing fluent caches
         drop.preparations.append(FluentCache.CacheEntity.self)

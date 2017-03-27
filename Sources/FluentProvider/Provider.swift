@@ -124,7 +124,7 @@ public final class Provider: Vapor.Provider {
         }
 
         if let k = self.defaultPageKey {
-            VaporFluent.defaultPageKey = k
+            FluentProvider.defaultPageKey = k
         }
 
         if let db = drop.database {
