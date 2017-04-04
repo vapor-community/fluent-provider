@@ -158,7 +158,7 @@ public final class Provider: Vapor.Provider {
 
         if drop.preparations.count == 0 {
             drop.log.warning("No preparations detected.")
-            drop.log.info("If you want to use models with Fluent, make sure to add the model to the Droplet's preparations array, e.g., `drop.preparations += ModelType.self`.")
+            drop.log.info("If you want to use models with Fluent, make sure to add the model to the Droplet's preparations array, e.g., `drop.preparations.append(ModelType.self)`.")
         }
 
         let prepare = Prepare(
