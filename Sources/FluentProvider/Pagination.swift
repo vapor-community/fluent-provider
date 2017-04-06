@@ -3,7 +3,7 @@ import HTTP
 public var defaultPageKey = "page"
 public var defaultPagePerKey = "size"
 
-extension QueryRepresentable where E: Paginatable {
+extension QueryRepresentable where E: Paginatable, Self: ExecutorRepresentable {
     /// Returns a paginated response using page 
     /// number from the request data
     public func paginate(
@@ -26,7 +26,7 @@ extension QueryRepresentable where E: Paginatable {
     }
 }
 
-extension Entity where Self: Paginatable {
+extension Entity where Self: Paginatable, Self: ExecutorRepresentable {
     /// Returns a paginated response on `.all()` entities
     /// using page number from the request data
     public static func paginate(
@@ -35,7 +35,7 @@ extension Entity where Self: Paginatable {
         perKey: String = defaultPagePerKey,
         _ sorts: [Sort] = Self.defaultPageSorts
     ) throws -> Page<Self> {
-        return try query().paginate(
+        return try makeQuery().paginate(
             for: req,
             key: key,
             perKey: perKey,
