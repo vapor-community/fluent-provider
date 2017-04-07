@@ -3,17 +3,7 @@ import Fluent
 import TypeSafeRouting
 import HTTP
 
-public protocol Model: Entity, NodeConvertible, StringInitializable { }
-
-extension Model {
-    public init(node: Node) throws {
-        try self.init(row: node.converted(in: node.context))
-    }
-    
-    public func makeNode(in context: Context?) throws -> Node {
-        return try makeRow().makeNode(in: context)
-    }
-}
+public protocol Model: Entity, StringInitializable { }
 
 extension ResponseRepresentable where Self: JSONRepresentable {
     public func makeResponse() throws -> Response {
