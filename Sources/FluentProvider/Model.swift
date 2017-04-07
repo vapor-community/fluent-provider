@@ -3,27 +3,21 @@ import Fluent
 import TypeSafeRouting
 import HTTP
 
-public protocol Model: Entity, JSONConvertible, NodeConvertible, StringInitializable, ResponseRepresentable { }
+public protocol Model: Entity, NodeConvertible, StringInitializable { }
 
 extension Model {
-    public func makeResponse() throws -> Response {
-        return try makeJSON().makeResponse()
-    }
-    
     public init(node: Node) throws {
-        if node.context.isRow == true {
-            try self.init(row: Row(node.wrapped))
-        } else {
-            try self.init(json: JSON(node.wrapped))
-        }
+        try self.init(row: node.converted(in: node.context))
     }
     
     public func makeNode(in context: Context?) throws -> Node {
-        if context?.isRow  == true {
-            return try Node(makeRow().wrapped)
-        } else {
-            return try Node(makeJSON().wrapped)
-        }
+        return try makeRow().makeNode(in: context)
+    }
+}
+
+extension ResponseRepresentable where Self: JSONRepresentable {
+    public func makeResponse() throws -> Response {
+        return try makeJSON().makeResponse()
     }
 }
 

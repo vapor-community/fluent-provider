@@ -1,6 +1,6 @@
 import HTTP
 
-extension QueryRepresentable where E: Filterable {
+extension QueryRepresentable where E: Filterable, Self: ExecutorRepresentable {
     /// filters the query using data from the request
     /// in conjunction with the `filterableKeys` property
     /// on the model's type
@@ -19,6 +19,6 @@ extension QueryRepresentable where E: Filterable {
 extension Entity where Self: Filterable {
     /// calls `query.filter(for: request)`
     public static func filter(for req: Request) throws -> Query<Self> {
-        return try query().filter(for: req)
+        return try makeQuery().filter(for: req)
     }
 }
