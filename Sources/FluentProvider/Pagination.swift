@@ -1,4 +1,5 @@
 import HTTP
+import JSON
 
 public var defaultPageKey = "page"
 public var defaultPagePerKey = "size"
@@ -45,7 +46,7 @@ extension Entity where Self: Paginatable, Self: ExecutorRepresentable {
 }
 
 
-extension Page: JSONRepresentable {
+extension Page where E: JSONRepresentable {
     public func makeJSON() throws -> JSON {
         var json = JSON()
         try json.set("page.position.current", number)
@@ -59,12 +60,10 @@ extension Page: JSONRepresentable {
             try json.set("page.position.previous", number - 1)
         }
         try json.set("page.position.max", count)
-        try json.set("data", data)
+        try json.set("data", data.makeJSON())
         return json
     }
-}
 
-extension Page: ResponseRepresentable {
     public func makeResponse() throws -> Response {
         return try makeJSON().makeResponse()
     }
