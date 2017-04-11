@@ -28,6 +28,9 @@ public final class Provider: Vapor.Provider {
     /// Default page size unless otherwise specified
     public let defaultPageSize: Int?
 
+    /// The name of Fluent's migration entity
+    public let migrationEntityName: String?
+    
     /// String for connecting pivot names.
     /// ex: user_pet vs. user+pet vs. user^pet
     /// default is _
@@ -39,6 +42,7 @@ public final class Provider: Vapor.Provider {
         keyNamingConvention: KeyNamingConvention? = nil,
         defaultPageKey: String? = nil,
         defaultPageSize: Int? = nil,
+        migrationEntityName: String? = nil,
         pivotNameConnector: String? = nil
     ) {
         self.idKey = idKey
@@ -46,6 +50,7 @@ public final class Provider: Vapor.Provider {
         self.keyNamingConvention = keyNamingConvention
         self.defaultPageKey = defaultPageKey
         self.defaultPageSize = defaultPageSize
+        self.migrationEntityName = migrationEntityName
         self.pivotNameConnector = pivotNameConnector
     }
 
@@ -96,6 +101,7 @@ public final class Provider: Vapor.Provider {
 
         self.defaultPageKey = fluent["defaultPageKey"]?.string
         self.defaultPageSize = fluent["defaultPageSize"]?.int
+        self.migrationEntityName = fluent["migrationEntityName"]?.string
         self.pivotNameConnector = fluent["pivotNameConnector"]?.string
 
         // make sure they have specified a fluent.driver
@@ -115,6 +121,10 @@ public final class Provider: Vapor.Provider {
         try drop.addConfigurable(driver: MemoryDriver.self, name: "memory")
         try drop.addConfigurable(driver: SQLiteDriver.self, name: "sqlite")
 
+        if let m = self.migrationEntityName {
+            Fluent.migrationEntityName = m
+        }
+        
         if let p = self.pivotNameConnector {
             Fluent.pivotNameConnector = p
         }
