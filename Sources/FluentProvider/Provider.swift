@@ -35,6 +35,10 @@ public final class Provider: Vapor.Provider {
     /// ex: user_pet vs. user+pet vs. user^pet
     /// default is _
     public let pivotNameConnector: String?
+    
+    /// If true, foreign keys will automatically
+    /// be added by Fluent
+    public let autoForeignKeys: Bool?
 
     public init(
         idKey: String? = nil,
@@ -43,7 +47,8 @@ public final class Provider: Vapor.Provider {
         defaultPageKey: String? = nil,
         defaultPageSize: Int? = nil,
         migrationEntityName: String? = nil,
-        pivotNameConnector: String? = nil
+        pivotNameConnector: String? = nil,
+        autoForeignKeys: Bool? = nil
     ) {
         self.idKey = idKey
         self.idType = idType
@@ -52,6 +57,7 @@ public final class Provider: Vapor.Provider {
         self.defaultPageSize = defaultPageSize
         self.migrationEntityName = migrationEntityName
         self.pivotNameConnector = pivotNameConnector
+        self.autoForeignKeys = autoForeignKeys
     }
 
     public init(config: Settings.Config) throws {
@@ -99,10 +105,12 @@ public final class Provider: Vapor.Provider {
             keyNamingConvention = nil
         }
 
+
         self.defaultPageKey = fluent["defaultPageKey"]?.string
         self.defaultPageSize = fluent["defaultPageSize"]?.int
         self.migrationEntityName = fluent["migrationEntityName"]?.string
         self.pivotNameConnector = fluent["pivotNameConnector"]?.string
+        self.autoForeignKeys = fluent["autoForeignKeys"]?.bool
 
         // make sure they have specified a fluent.driver
         // to help avoid confusing `noDatabase` errors.
@@ -114,13 +122,13 @@ public final class Provider: Vapor.Provider {
             )
         }
     }
-
-    public func beforeRun(_ drop: Droplet) throws {
-        // add configurable driver types, this must 
+    
+    public func boot(_ drop: Droplet) throws {
+        // add configurable driver types, this must
         // come before the preparation calls
         try drop.addConfigurable(driver: MemoryDriver.self, name: "memory")
         try drop.addConfigurable(driver: SQLiteDriver.self, name: "sqlite")
-
+        
         if let m = self.migrationEntityName {
             Fluent.migrationEntityName = m
         }
@@ -128,15 +136,21 @@ public final class Provider: Vapor.Provider {
         if let p = self.pivotNameConnector {
             Fluent.pivotNameConnector = p
         }
-
+        
         if let s = self.defaultPageSize {
             Fluent.defaultPageSize = s
         }
-
+        
         if let k = self.defaultPageKey {
             FluentProvider.defaultPageKey = k
         }
+        
+        if let f = self.autoForeignKeys {
+            Fluent.autoForeignKeys = f
+        }
+    }
 
+    public func beforeRun(_ drop: Droplet) throws {
         if let db = drop.database {
             drop.addConfigurable(cache: FluentCache(db), name: "fluent")
 
@@ -187,6 +201,4 @@ public final class Provider: Vapor.Provider {
         /// Preparations run everytime to ensure database is configured properly
         try prepare.run(arguments: drop.arguments)
     }
-
-    public func boot(_ drop: Droplet) {}
 }
