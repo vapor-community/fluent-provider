@@ -86,7 +86,7 @@ extension FluentCache {
 extension FluentCache.CacheEntity: Preparation {
     public static func prepare(_ database: Database) throws {
         try database.create(self) { entity in
-            entity.id(for: self)
+            entity.id()
             entity.string("key")
             entity.string("value")
             entity.date("expiration", optional: true)
