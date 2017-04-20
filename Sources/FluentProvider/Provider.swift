@@ -128,10 +128,10 @@ public final class Provider: Vapor.Provider {
     }
     
     public func boot(_ config: Config) throws {
-        config.addConfigurable(cache: FluentCache.self, name: "fluent")
-        config.addConfigurable(driver: MemoryDriver.self, name: "memory")
-        config.addConfigurable(driver: SQLiteDriver.self, name: "sqlite")
-        config.addConfigurable(command: Prepare.self, name: "prepare")
+        config.addConfigurable(cache: FluentCache.init, name: "fluent")
+        config.addConfigurable(driver: MemoryDriver.init, name: "memory")
+        config.addConfigurable(driver: SQLiteDriver.init, name: "sqlite")
+        config.addConfigurable(command: Prepare.init, name: "prepare")
     }
     
     public func boot(_ drop: Droplet) throws {

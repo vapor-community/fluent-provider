@@ -2,15 +2,8 @@ extension Config {
     /// Adds a configurable Driver instance.
     public func addConfigurable<
         D: Driver
-    >(driver: D, name: String) {
-        customAddConfigurable(instance: driver, unique: "driver", name: name)
-    }
-    
-    /// Adds a configurable Driver class.
-    public func addConfigurable<
-        D: Driver & ConfigInitializable
-    >(driver: D.Type, name: String) {
-        customAddConfigurable(class: D.self, unique: "driver", name: name)
+    >(driver: @escaping Config.Lazy<D>, name: String) {
+        customAddConfigurable(closure: driver, unique: "driver", name: name)
     }
     
     /// Resolves the configured Driver.
