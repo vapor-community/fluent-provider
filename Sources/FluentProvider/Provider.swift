@@ -1,4 +1,8 @@
+import Console
+
 public final class Provider: Vapor.Provider {
+    public static let repositoryName = "fluent-provider"
+    
     /// The string value for the
     /// default identifier key.
     ///
@@ -60,7 +64,7 @@ public final class Provider: Vapor.Provider {
         self.autoForeignKeys = autoForeignKeys
     }
 
-    public init(config: Settings.Config) throws {
+    public init(config: Config) throws {
         guard let fluent = config["fluent"] else {
             throw ConfigError.missingFile("fluent")
         }
@@ -123,11 +127,19 @@ public final class Provider: Vapor.Provider {
         }
     }
     
+    public func boot(_ config: Config) throws {
+        config.addConfigurable(cache: FluentCache.self, name: "fluent")
+        config.addConfigurable(driver: MemoryDriver.self, name: "memory")
+        config.addConfigurable(driver: SQLiteDriver.self, name: "sqlite")
+        config.addConfigurable(command: Prepare.self, name: "prepare")
+    }
+    
     public func boot(_ drop: Droplet) throws {
         // add configurable driver types, this must
         // come before the preparation calls
-        try drop.addConfigurable(driver: MemoryDriver.self, name: "memory")
-        try drop.addConfigurable(driver: SQLiteDriver.self, name: "sqlite")
+        let driver = try drop.config.resolveDriver()
+        let database = Database(driver)
+        drop.database = database
         
         if let m = self.migrationEntityName {
             Fluent.migrationEntityName = m
@@ -148,57 +160,21 @@ public final class Provider: Vapor.Provider {
         if let f = self.autoForeignKeys {
             Fluent.autoForeignKeys = f
         }
-    }
-
-    public func beforeRun(_ drop: Droplet) throws {
-        if let db = drop.database {
-            drop.addConfigurable(cache: FluentCache(db), name: "fluent")
-
-            if let idType = self.idType {
-                db.idType = idType
-            }
-
-            if let idKey = self.idKey {
-                db.idKey = idKey
-            }
-
-            if let keyNamingConvention = self.keyNamingConvention {
-                db.keyNamingConvention = keyNamingConvention
-            }
-        } else {
-            let driver = drop.config["fluent", "driver"]?.string ?? ""
-            let reason = "Make sure you have properly configured the provider for driver type '\(driver)'"
-            if drop.preparations.count > 0 {
-                drop.log.error("Unable to run preparations without a database. \(reason).")
-                throw ConfigError.unsupported(
-                    value: driver, 
-                    key: ["driver"], 
-                    file: "fluent"
-                )
-            } else {
-                drop.log.warning("No database has been set. \(reason).")
-            }
-        }
-
-        if drop.preparations.count == 0 {
-            drop.log.warning("No preparations detected.")
-            drop.log.info("If you want to use models with Fluent, make sure to add the model to the Droplet's preparations array, e.g., `drop.preparations.append(ModelType.self)`.")
-        }
-
-        let prepare = Prepare(
-            console: drop.console, 
-            preparations: drop.preparations, 
-            database: drop.database
-        )
-        drop.commands.insert(prepare, at: 0)
-
-        // ensure we're not already preparing so we avoid running twice
-        guard drop.arguments.count < 2 || drop.arguments[1] != prepare.id else {
-            return
+        
+        if let idType = self.idType {
+            database.idType = idType
         }
         
-        // TODO: Propagate error up when Providers have `beforeRun` throwing
-        /// Preparations run everytime to ensure database is configured properly
-        try prepare.run(arguments: drop.arguments)
+        if let idKey = self.idKey {
+            database.idKey = idKey
+        }
+        
+        if let keyNamingConvention = self.keyNamingConvention {
+            database.keyNamingConvention = keyNamingConvention
+        }
+        
+        try drop.prepare()
     }
+
+    public func beforeRun(_ drop: Droplet) throws { }
 }
