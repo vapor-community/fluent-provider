@@ -138,7 +138,14 @@ public final class Provider: Vapor.Provider {
         // add configurable driver types, this must
         // come before the preparation calls
         let driver = try drop.config.resolveDriver()
-        let database = Database(driver)
+        
+        let database: Database
+        if let maxConnections = drop.config["fluent", "maxConnections"]?.int {
+            database = Database(driver, maxConnections: maxConnections)
+        } else {
+            database = Database(driver)
+        }
+        
         drop.database = database
         
         if let m = self.migrationEntityName {
