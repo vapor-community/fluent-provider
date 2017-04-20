@@ -13,7 +13,7 @@ extension ResponseRepresentable where Self: JSONRepresentable {
 
 // MARK: StringInitializable
 extension StringInitializable where Self: Entity {
-    public init?(from string: String) throws {
+    public init?(_ string: String) throws {
         if let model = try Self.find(string) {
             self = model
         } else {
