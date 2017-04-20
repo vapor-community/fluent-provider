@@ -4,21 +4,17 @@ import XCTest
 class CacheTests: XCTestCase {
     func testHappyPath() throws {
         // config specifying memory database
-        var config = Config([:])
+        var config = try Config(arguments: ["vapor", "serve", "--port=8832", "--env=debug"])
         try config.set("fluent.driver", "memory")
         try config.set("droplet.cache", "fluent")
-
-        // create droplet with Fluent provider
-        let drop = try Droplet(
-            arguments: ["vapor", "serve", "--port=8832"],
-            environment: .custom("debug"), 
-            config: config
-        )
-        try drop.addProvider(FluentProvider.Provider.self)
+        try config.addProvider(FluentProvider.Provider.self)
         
         // add the entity for storing fluent caches
-        drop.preparations.append(FluentCache.CacheEntity.self)
+        config.preparations.append(FluentCache.CacheEntity.self)
 
+        // create droplet with Fluent provider
+        let drop = try Droplet(config)
+        
         // run the droplet
         background {
             try! drop.run()

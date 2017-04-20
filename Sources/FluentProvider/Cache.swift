@@ -1,11 +1,10 @@
 import Cache
+import Vapor
 
 public final class FluentCache: CacheProtocol {
-    public let database: Database
-    public let defaultExpiration: Date?
-    public init(_ database: Database, defaultExpiration: Date? = nil) {
-        self.database = database
-        self.defaultExpiration = defaultExpiration
+    public let driver: Driver
+    public init(_ driver: Driver) {
+        self.driver = driver
     }
 
     public func get(_ key: String) throws -> Node? {
@@ -47,7 +46,7 @@ public final class FluentCache: CacheProtocol {
     }
 
     private func _find(_ key: String) throws -> CacheEntity? {
-        return try Query<CacheEntity>(database).filter("key", key).first()
+        return try Query<CacheEntity>(driver).filter("key", key).first()
     }
 }
 
@@ -95,5 +94,14 @@ extension FluentCache.CacheEntity: Preparation {
 
     public static func revert(_ database: Database) throws {
         try database.delete(self)
+    }
+}
+
+// MARK: Config
+
+extension FluentCache: ConfigInitializable {
+    public convenience init(config: Config) throws {
+        let driver = try config.resolveDriver()
+        self.init(driver)
     }
 }
