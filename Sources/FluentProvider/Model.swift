@@ -5,14 +5,15 @@ import HTTP
 public protocol Model: Entity, Parameterizable { }
 
 // MARK: Parameterizable
-extension StringInitializable where Self: Entity {
+
+extension Parameterizable where Self: Entity {
     /// the unique key to use as a slug in route building
-    static var uniqueSlug: String {
+    public static var uniqueSlug: String {
         return foreignIdKey
     }
     
     // returns the found model for the resolved url parameter
-    static func make(for parameter: String) throws -> Self {
+    public static func make(for parameter: String) throws -> Self {
         let id = Identifier(parameter)
         guard let found = try find(id) else {
             throw Abort(.notFound, reason: "No \(Self.self) with that identifier was found.")
@@ -20,6 +21,7 @@ extension StringInitializable where Self: Entity {
         return found
     }
 }
+
 
 // MARK: JSON
 

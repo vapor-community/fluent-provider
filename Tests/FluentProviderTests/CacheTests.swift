@@ -2,6 +2,10 @@ import XCTest
 @testable import FluentProvider
 
 class CacheTests: XCTestCase {
+    override func setUp() {
+        Node.fuzzy = [Node.self]
+    }
+    
     func testHappyPath() throws {
         // config specifying memory database
         var config = try Config(arguments: ["vapor", "serve", "--port=8832", "--env=debug"])
