@@ -47,6 +47,9 @@ public final class Provider: Vapor.Provider {
     /// be added by Fluent
     public let autoForeignKeys: Bool?
 
+    /// If true, queries will be logged.
+    public let log: Bool?
+
     public init(
         idKey: String? = nil,
         idType: IdentifierType? = nil,
@@ -56,7 +59,8 @@ public final class Provider: Vapor.Provider {
         migrationEntityName: String? = nil,
         pivotNameConnector: String? = nil,
         autoForeignKeys: Bool? = nil,
-        skipPreparations: Bool? = nil
+        skipPreparations: Bool? = nil,
+        log: Bool? = nil
     ) {
         self.idKey = idKey
         self.idType = idType
@@ -67,6 +71,7 @@ public final class Provider: Vapor.Provider {
         self.pivotNameConnector = pivotNameConnector
         self.autoForeignKeys = autoForeignKeys
         self.skipPreparations = skipPreparations
+        self.log = log
     }
 
     public init(config: Config) throws {
@@ -131,6 +136,7 @@ public final class Provider: Vapor.Provider {
         }
         self.pivotNameConnector = fluent["pivotNameConnector"]?.string
         self.autoForeignKeys = fluent["autoForeignKeys"]?.bool
+        self.log = fluent["log"]?.bool
 
         // make sure they have specified a fluent.driver
         // to help avoid confusing `noDatabase` errors.
@@ -190,6 +196,12 @@ public final class Provider: Vapor.Provider {
         
         if let idKey = self.idKey {
             database.idKey = idKey
+        }
+
+        if self.log == true {
+            database.log = { [weak drop] query in
+                drop?.log.info(query.description)
+            }
         }
         
         if let keyNamingConvention = self.keyNamingConvention {
