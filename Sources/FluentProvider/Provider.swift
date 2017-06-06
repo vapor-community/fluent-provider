@@ -183,8 +183,8 @@ public final class Provider: Vapor.Provider {
         }
 
         if self.log == true {
-            database.log = { query in
-                drop.log.info(query.description)
+            database.log = { [weak drop] query in
+                drop?.log.info(query.description)
             }
         }
         
