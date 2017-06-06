@@ -10,14 +10,18 @@ extension SQLiteDriver: ConfigInitializable {
             throw ConfigError.missingFile("sqlite")
         }
 
-        guard let path = sqlite["path"]?.string else {
+        guard var path = sqlite["path"]?.string else {
             throw ConfigError.missing(
-                key: ["path"], 
-                file: "sqlite", 
+                key: ["path"],
+                file: "sqlite",
                 desiredType: String.self
             )
         }
 
+        if !path.hasPrefix("/") {
+            path = config.workDir + path
+        }
+        
         try self.init(path: path)
     }
 }
