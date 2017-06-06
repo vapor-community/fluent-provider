@@ -1,11 +1,8 @@
 import XCTest
 @testable import FluentProvider
+import SQLite
 
 class CacheTests: XCTestCase {
-    override func setUp() {
-        Node.fuzzy = [Node.self]
-    }
-    
     func testHappyPath() throws {
         // config specifying memory database
         var config = try Config(arguments: ["vapor", "serve", "--port=8832", "--env=debug"])
@@ -56,7 +53,42 @@ class CacheTests: XCTestCase {
     }
 
 
+    func testSkipPreparations() throws {
+        // config specifying memory database
+        var config = try Config(arguments: ["vapor", "serve", "--port=8833", "--env=debug"])
+        try config.set("fluent.driver", "memory")
+        try config.set("droplet.cache", "fluent")
+        try config.set("fluent.migrationEntityName", Node.null)
+        try config.addProvider(FluentProvider.Provider.self)
+
+        // add the entity for storing fluent caches
+        config.preparations.append(FluentCache.CacheEntity.self)
+
+        // create droplet with Fluent provider
+        let drop = try Droplet(config)
+
+        // run the droplet
+        background {
+            try! drop.run()
+        }
+        drop.console.wait(seconds: 1)
+
+        // test cache
+        XCTAssert(drop.cache is FluentCache)
+
+        do {
+            try drop.cache.set("foo", "bar")
+            XCTFail("Should not have set properly")
+        } catch SQLite.SQLiteError.prepare {
+            // pass
+            // a sqlite prepare error should be thrown
+            // since preparations were skipped
+        }
+    }
+
+
     static var allTests = [
         ("testHappyPath", testHappyPath),
+        ("testSkipPreparations", testSkipPreparations),
     ]
 }
