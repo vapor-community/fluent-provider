@@ -39,6 +39,9 @@ public final class Provider: Vapor.Provider {
     /// ex: user_pet vs. user+pet vs. user^pet
     /// default is _
     public let pivotNameConnector: String?
+
+    /// If true, preparations will not be run.
+    public let skipPreparations: Bool?
     
     /// If true, foreign keys will automatically
     /// be added by Fluent
@@ -56,6 +59,7 @@ public final class Provider: Vapor.Provider {
         migrationEntityName: String? = nil,
         pivotNameConnector: String? = nil,
         autoForeignKeys: Bool? = nil,
+        skipPreparations: Bool? = nil,
         log: Bool? = nil
     ) {
         self.idKey = idKey
@@ -66,6 +70,7 @@ public final class Provider: Vapor.Provider {
         self.migrationEntityName = migrationEntityName
         self.pivotNameConnector = pivotNameConnector
         self.autoForeignKeys = autoForeignKeys
+        self.skipPreparations = skipPreparations
         self.log = log
     }
 
@@ -117,7 +122,18 @@ public final class Provider: Vapor.Provider {
 
         self.defaultPageKey = fluent["defaultPageKey"]?.string
         self.defaultPageSize = fluent["defaultPageSize"]?.int
-        self.migrationEntityName = fluent["migrationEntityName"]?.string
+        if let name = fluent["migrationEntityName"] {
+            if name.isNull {
+                self.migrationEntityName = nil
+                self.skipPreparations = true
+            } else {
+                self.migrationEntityName = name.string
+                self.skipPreparations = false
+            }
+        } else {
+            self.migrationEntityName = nil
+            self.skipPreparations = false
+        }
         self.pivotNameConnector = fluent["pivotNameConnector"]?.string
         self.autoForeignKeys = fluent["autoForeignKeys"]?.bool
         self.log = fluent["log"]?.bool
@@ -191,8 +207,10 @@ public final class Provider: Vapor.Provider {
         if let keyNamingConvention = self.keyNamingConvention {
             database.keyNamingConvention = keyNamingConvention
         }
-        
-        try drop.prepare()
+
+        if skipPreparations != true {
+            try drop.prepare()
+        }
     }
 
     public func beforeRun(_ drop: Droplet) throws { }
