@@ -161,11 +161,24 @@ public final class Provider: Vapor.Provider {
         // come before the preparation calls
         let driver = try drop.config.resolveDriver()
         
+        let idType = self.idType ?? driver.idType
+        
+        let idKey = self.idKey ?? driver.idKey
+        
+        let keyNamingConvention = self.keyNamingConvention ?? driver.keyNamingConvention
+        
         let database: Database
+        
         if let maxConnections = drop.config["fluent", "maxConnections"]?.int {
-            database = Database(driver, maxConnections: maxConnections)
+            
+            let threadConnectionPool = ThreadConnectionPool(
+                driver,
+                maxConnections: maxConnections // some number larger than the max threads
+            )
+            
+            database = DatabaseImpl(driver, threadConnectionPool, idKey, idType, keyNamingConvention)
         } else {
-            database = Database(driver)
+            database = DatabaseImpl(driver)
         }
         
         drop.database = database
@@ -190,22 +203,10 @@ public final class Provider: Vapor.Provider {
             Fluent.autoForeignKeys = f
         }
         
-        if let idType = self.idType {
-            database.idType = idType
-        }
-        
-        if let idKey = self.idKey {
-            database.idKey = idKey
-        }
-
         if self.log == true {
             database.log = { [weak drop] query in
                 drop?.log.info(query.description)
             }
-        }
-        
-        if let keyNamingConvention = self.keyNamingConvention {
-            database.keyNamingConvention = keyNamingConvention
         }
 
         if skipPreparations != true {
