@@ -52,7 +52,7 @@ extension Page where E: JSONRepresentable {
         try json.set("page.position.current", number)
         try json.set("page.data.total", total)
         try json.set("page.data.per", size)
-        let count = total / size
+        let count = total / size + 1
         if number < count {
             try json.set("page.position.next", number + 1)
         }
