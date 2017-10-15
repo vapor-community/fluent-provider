@@ -78,7 +78,7 @@ class CacheTests: XCTestCase {
 
         do {
             try drop.cache.set("foo", "bar")
-            XCTFail("Should not have set properly")
+            XCTFail("Should not have set property")
         } catch SQLite.SQLiteError.prepare {
             // pass
             // a sqlite prepare error should be thrown
