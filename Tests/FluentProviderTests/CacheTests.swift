@@ -78,8 +78,43 @@ class CacheTests: XCTestCase {
 
         do {
             try drop.cache.set("foo", "bar")
-            XCTFail("Should not have set properly")
-        } catch SQLite.SQLiteError.prepare {
+            XCTFail("Should not have set property")
+        } catch StatusError.error(let s) where s.starts(with: "no such table") {
+            // pass
+            // a sqlite prepare error should be thrown
+            // since preparations were skipped
+        }
+    }
+
+
+    func testExplicitSkipPreparations() throws {
+        // config specifying memory database
+        var config = try Config(arguments: ["vapor", "serve", "--port=8833", "--env=debug"])
+        try config.set("fluent.driver", "memory")
+        try config.set("droplet.cache", "fluent")
+        try config.set("fluent.migrationEntityName", "fluent")
+        try config.set("fluent.skipPreparations", true)
+        try config.addProvider(FluentProvider.Provider.self)
+
+        // add the entity for storing fluent caches
+        config.preparations.append(FluentCache.CacheEntity.self)
+
+        // create droplet with Fluent provider
+        let drop = try Droplet(config)
+
+        // run the droplet
+        background {
+            try! drop.run()
+        }
+        drop.console.wait(seconds: 1)
+
+        // test cache
+        XCTAssert(drop.cache is FluentCache)
+
+        do {
+            try drop.cache.set("foo", "bar")
+            XCTFail("Should not have set property")
+        } catch StatusError.error(let s) where s.starts(with: "no such table") {
             // pass
             // a sqlite prepare error should be thrown
             // since preparations were skipped
@@ -90,5 +125,6 @@ class CacheTests: XCTestCase {
     static var allTests = [
         ("testHappyPath", testHappyPath),
         ("testSkipPreparations", testSkipPreparations),
+        ("testExplicitSkipPreparations", testExplicitSkipPreparations)
     ]
 }

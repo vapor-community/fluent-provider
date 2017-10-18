@@ -118,22 +118,22 @@ public final class Provider: Vapor.Provider {
         } else {
             keyNamingConvention = nil
         }
-
+        
+        var shouldSkipPreparationsByDefault: Bool = false
 
         self.defaultPageKey = fluent["defaultPageKey"]?.string
         self.defaultPageSize = fluent["defaultPageSize"]?.int
         if let name = fluent["migrationEntityName"] {
             if name.isNull {
                 self.migrationEntityName = nil
-                self.skipPreparations = true
+                shouldSkipPreparationsByDefault = true
             } else {
                 self.migrationEntityName = name.string
-                self.skipPreparations = false
             }
         } else {
             self.migrationEntityName = nil
-            self.skipPreparations = false
         }
+        self.skipPreparations = fluent["skipPreparations"]?.bool ?? shouldSkipPreparationsByDefault
         self.pivotNameConnector = fluent["pivotNameConnector"]?.string
         self.autoForeignKeys = fluent["autoForeignKeys"]?.bool
         self.log = fluent["log"]?.bool
