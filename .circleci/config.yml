@@ -24,7 +24,7 @@ jobs:
 
   macos-3:
     macos:
-      xcode: "8.3"
+      xcode: "8.2"
     steps:
       - run: brew install vapor/tap/vapor
       - checkout
