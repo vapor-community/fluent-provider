@@ -114,7 +114,7 @@ class CacheTests: XCTestCase {
         do {
             try drop.cache.set("foo", "bar")
             XCTFail("Should not have set property")
-        } catch StatusError.error(let s) where s.starts(with: "no such table") {
+        } catch StatusError.error(let s) where s.hasPrefix("no such table") {
             // pass
             // a sqlite prepare error should be thrown
             // since preparations were skipped
